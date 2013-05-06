@@ -1,5 +1,5 @@
 /*
- *Copyright (C) 2012 The CyanogenMod Project
+ *Copyright (C) 2013 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,25 +24,22 @@ import android.preference.Preference;
 import android.preference.ListPreference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceManager;
-import android.os.Vibrator;
 
-public class VibratorIntensity extends ListPreference implements OnPreferenceChangeListener {
+public class PanelColorTemperature extends ListPreference implements OnPreferenceChangeListener {
 
-    private Vibrator vibrator;
-    public VibratorIntensity(Context context, AttributeSet attrs) {
+    public PanelColorTemperature(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.setOnPreferenceChangeListener(this);
-        this.vibrator = (Vibrator) context.getSystemService(context.VIBRATOR_SERVICE);
     }
 
-    private static final String FILE = "/sys/vibrator/pwm_val";
+    private static final String FILE = "/sys/class/lcd/panel/panel_colors";
 
     public static boolean isSupported() {
         return Utils.fileExists(FILE);
     }
 
     /**
-     * Restore vibrator intensity setting from SharedPreferences. (Write to kernel.)
+     * Restore panel temp setting from SharedPreferences. (Write to kernel.)
      * @param context       The context to read the SharedPreferences from
      */
     public static void restore(Context context) {
@@ -51,14 +48,11 @@ public class VibratorIntensity extends ListPreference implements OnPreferenceCha
         }
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        Utils.writeValue(FILE, sharedPrefs.getString(DeviceSettings.KEY_VIBRATOR_INTENSITY, "50"));
+        Utils.writeValue(FILE, sharedPrefs.getString(DeviceSettings.KEY_PANEL_COLOR_TEMPERATURE, "2"));
     }
 
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         Utils.writeValue(FILE, (String) newValue);
-        if (this.vibrator != null) {
-            this.vibrator.vibrate(300);
-        }
         return true;
     }
 
